@@ -1,0 +1,70 @@
+# --- Python bytecode / cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual environments ---
+venv/
+.env/
+.venv/
+
+# --- Package / build artifacts ---
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+wheelhouse/
+
+# --- Logs & runtime ---
+*.log
+*.pid
+
+# --- Test / coverage ---
+.coverage
+.coverage.*
+.cache/
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.pyre/
+.dmypy.json
+
+# --- Type checker / IDE / tooling ---
+.idea/
+.vscode/
+*.iml
+
+# --- OS / misc ---
+.DS_Store
+Thumbs.db
+
+# --- Jupyter / notebooks ---
+.ipynb_checkpoints/
+
+# --- Optional: plot exports / reports (uncomment if you auto-generate) ---
+# reports/
+# outputs/
+# *.html  # (Si exportas Plotly a HTML y no quieres versionarlos)
+
+# --- Environment metadata ---
+.python-version
+
+# --- Local scripts / scratch ---
+*.swp
+*.swo
+
+# --- Wheel metadata caches ---
+pip-wheel-metadata/
+
+# --- Poetry / PDM / other managers (not used yet, precaution) ---
+.poetry/
+.pdm-python/
+
+# --- VS Code local history ---
+.history/
+
+# --- Security ---
+# Nunca añadir llaves o credenciales aquí. Usa variables de entorno.
