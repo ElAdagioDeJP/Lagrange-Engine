@@ -2,6 +2,17 @@ from __future__ import annotations
 import customtkinter as ctk
 import threading
 import numpy as np
+import os, sys
+
+# Permite ejecutar tanto:
+#   python -m src.ui.main_app   (desde la raíz del repo)
+# como:
+#   python main_app.py          (estando dentro de src/ui)
+if 'src' not in {p.split(os.sep)[-1] for p in sys.path}:
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    if repo_root not in sys.path:
+        sys.path.insert(0, repo_root)
+
 from src.core.function_parser import FunctionParser
 from src.solvers.gradient_descent import GradientDescentSolver
 from src.solvers.lagrange import LagrangeSolver
