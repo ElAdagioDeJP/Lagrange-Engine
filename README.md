@@ -92,7 +92,44 @@ Ejecutar (si tienes pytest instalado):
 pytest -q
 ```
 
-## 🔜 Roadmap Sugerido
+## � Métodos Implementados (Detalle Matemático)
+
+### 1. Descenso por Gradiente
+Iteración: x_{k+1} = x_k - α ∇f(x_k). Criterio de parada: ||∇f(x_k)|| < tol.
+Limitaciones: paso fijo; podría oscilar si α grande; lento en valles alargados.
+
+### 2. Multiplicadores de Lagrange (igualdades)
+Problema: min f(x) s.a. g_i(x)=0. L(x,λ)= f(x)+ Σ λ_i g_i(x). Se resuelve sistema estacionario ∂L/∂x=0, g_i(x)=0 con nsolve. Riesgos: sensibilidad a punto inicial; puede converger a saddle.
+
+### 3. Minimización sin restricciones (SciPy BFGS)
+Usa aproximación quasi-Newton. + Rápido en problemas suaves. - Requiere derivadas implícitas vía evaluaciones.
+
+### 4. Penalización para desigualdades
+Desigualdades transformadas a g_i(x) <= 0. Función penalizada: F_ρ(x)= f(x)+ ρ Σ max(0,g_i(x))^2. Incremento ρ hasta violación < tol_cons. Limitaciones: puede distorsionar paisaje; elección de ρ crítica.
+
+### 5. Estructura Multi-variable
+Derivadas parciales generadas automáticamente (SymPy). Escalable mientras el costo simbólico sea manejable.
+
+## ⚠️ Manejo de Errores
+Lagrange: si nsolve falla se informa y no bloquea otros métodos. Plot y penalización encapsulan excepciones.
+
+## 🧱 Soporte de Desigualdades
+Actualmente vía penalización externa (no condiciones KKT completas). Futuro: añadir gradientes de restricciones activas y multiplicadores estimados.
+
+## ✅ Cobertura de Pruebas Añadida
+Archivo `tests/test_solvers.py` incluye:
+- Quadratic (BFGS)
+- Descenso por gradiente 1D
+- Lagrange igualdad simple
+- Penalización con desigualdad
+
+## 🔄 Próximos Pasos Recomendados
+- Test de trayectorias y regresión numérica
+- Implementar método de barrera logarítmica
+- Estimar λ para desigualdades activas (KKT)
+- Exportar reporte HTML con tabla + gráfica
+
+## �🔜 Roadmap Sugerido
 
 - Soporte para restricciones de desigualdad vía KKT.
 - Métodos adicionales: Newton, quasi-Newton (BFGS), Penalty / Barrier.

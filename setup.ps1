@@ -23,12 +23,19 @@ Write-Host 'Activando entorno virtual...' -ForegroundColor Cyan
 
 if (Test-Path 'requirements.txt') {
     Write-Host 'Instalando dependencias...' -ForegroundColor Cyan
-    pip install -r requirements.txt
+    & $Python -m pip install --upgrade pip
+    & $Python -m pip install -r requirements.txt
 } else {
     Write-Host 'No se encontró requirements.txt' -ForegroundColor Red
 }
-
-Write-Host 'Listo. Ejecuta: python -m src.ui.main_app' -ForegroundColor Green
-
 Write-Host 'Lanzando la aplicacion...' -ForegroundColor Cyan
-python -m src.ui.main_app
+$venvPython = Join-Path $venvPath 'Scripts\python.exe'
+if (Test-Path $venvPython) { $Python = $venvPython }
+
+# Ejecutar desde raíz usando el paquete completo
+try {
+    & $Python -m src.ui.main_app
+} catch {
+    Write-Host "Error ejecutando la aplicación: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
