@@ -31,13 +31,17 @@ class MainApp(ctk.CTk):
         self.var_entry = ctk.CTkEntry(self, placeholder_text="Variables (ej: x y)")
         self.var_entry.pack(fill="x", padx=10, pady=5)
 
+        self.obj_placeholder = "Función Objetivo (ej: x**2 + y**2)"
         self.obj_entry = ctk.CTkTextbox(self, height=80)
-        self.obj_entry.insert("1.0", "x**2 + y**2")
         self.obj_entry.pack(fill="x", padx=10, pady=5)
+        self.obj_entry.bind("<FocusIn>", self._obj_focus_in)
+        self.obj_entry.bind("<FocusOut>", self._obj_focus_out)
 
+        self.constr_placeholder = "Restricciones (ej: x + y = 10)"
         self.constr_entry = ctk.CTkTextbox(self, height=120)
-        self.constr_entry.insert("1.0", "")
         self.constr_entry.pack(fill="x", padx=10, pady=5)
+        self.constr_entry.bind("<FocusIn>", self._constr_focus_in)
+        self.constr_entry.bind("<FocusOut>", self._constr_focus_out)
 
         # Frame métodos
         self.method_frame = ctk.CTkFrame(self)
@@ -64,6 +68,30 @@ class MainApp(ctk.CTk):
         self.output = ctk.CTkTextbox(self)
         self.output.pack(fill="both", expand=True, padx=10, pady=10)
 
+        # Set initial placeholder state
+        self._obj_focus_out(None)
+        self._constr_focus_out(None)
+
+    def _obj_focus_in(self, event):
+        if self.obj_entry.cget("text_color") == "gray":
+            self.obj_entry.delete("1.0", "end")
+            self.obj_entry.configure(text_color=("black", "white"))
+
+    def _obj_focus_out(self, event):
+        if not self.obj_entry.get("1.0", "end-1c"):
+            self.obj_entry.insert("1.0", self.obj_placeholder)
+            self.obj_entry.configure(text_color="gray")
+
+    def _constr_focus_in(self, event):
+        if self.constr_entry.cget("text_color") == "gray":
+            self.constr_entry.delete("1.0", "end")
+            self.constr_entry.configure(text_color=("black", "white"))
+
+    def _constr_focus_out(self, event):
+        if not self.constr_entry.get("1.0", "end-1c"):
+            self.constr_entry.insert("1.0", self.constr_placeholder)
+            self.constr_entry.configure(text_color="gray")
+
     def run_solvers(self) -> None:
         threading.Thread(target=self._run_solvers_impl, daemon=True).start()
 
@@ -81,7 +109,11 @@ class MainApp(ctk.CTk):
         try:
             vars_text = self.var_entry.get().strip()
             obj_text = self.obj_entry.get("1.0", "end").strip()
+            if self.obj_entry.cget("text_color") == "gray":
+                obj_text = ""
             constr_text = self.constr_entry.get("1.0", "end").strip()
+            if self.constr_entry.cget("text_color") == "gray":
+                constr_text = ""
             problem = FunctionParser.parse_problem(obj_text, vars_text, constr_text)
             start = self._parse_start(len(problem.variables))
             results = []
