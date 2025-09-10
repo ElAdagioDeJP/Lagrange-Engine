@@ -1,3 +1,9 @@
+"""
+Parcial VI Métodos Cuantitativos - Proyecto - Programacion No lineal
+Juan Vargas - 30.448.315
+Irisbel Ruiz - 30.864.236
+"""
+
 from __future__ import annotations
 import customtkinter as ctk
 import threading
