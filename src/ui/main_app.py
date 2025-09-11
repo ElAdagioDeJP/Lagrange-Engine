@@ -1,3 +1,9 @@
+"""
+Parcial VI Métodos Cuantitativos - Proyecto - Programacion No lineal
+Juan Vargas - 30.448.315
+Irisbel Ruiz - 30.864.236
+"""
+
 from __future__ import annotations
 import customtkinter as ctk
 import threading
@@ -24,11 +30,21 @@ from src.core.results import format_results_table
 class MainApp(ctk.CTk):
     def __init__(self) -> None:
         super().__init__()
-        self.title("Lagrange Engine - Optimizador Avanzado")
-        self.geometry("1400x900")
-        self.minsize(1200, 700)  # Tamaño mínimo
+        self.title("🌸 Lagrange Engine - Optimizador Avanzado 🌸")
+        self.geometry("1100x700")
+
+        # Tema 
         ctk.set_appearance_mode("dark")
-        ctk.set_default_color_theme("blue")
+
+        # 🎨 Paleta de colores 
+        self.bg_color = "#D98CB3"     # Rosa pastel de fondo
+        self.frame_color = "#F4CCE3"  # Rosa lila más intenso
+        self.entry_color = "#F7DDEB"  # Rosa claro para entradas
+        self.accent_color = "#E6A4C5" # Botones rosados
+        self.hover_color = "#D98CB3"  # Hover más oscuro
+        self.text_color = "#4A3C4C"   # Gris-violeta suave
+
+        self.configure(fg_color=self.bg_color)
 
         # Crear notebook para pestañas
         self.notebook = ctk.CTkTabview(self)
@@ -142,6 +158,8 @@ class MainApp(ctk.CTk):
         self.obj_entry = ctk.CTkTextbox(main_frame, height=80)
         self.obj_entry.insert("1.0", "x**2 + y**2")
         self.obj_entry.pack(fill="x", padx=10, pady=5)
+        self.obj_entry.bind("<FocusIn>", self._obj_focus_in)
+        self.obj_entry.bind("<FocusOut>", self._obj_focus_out)
 
         # Restricciones
         constr_label = ctk.CTkLabel(main_frame, text="Restricciones (una por línea):", 
@@ -150,6 +168,8 @@ class MainApp(ctk.CTk):
         self.constr_entry = ctk.CTkTextbox(main_frame, height=120)
         self.constr_entry.insert("1.0", "# Ejemplos:\n# x + y = 10\n# x >= 0\n# y <= 5")
         self.constr_entry.pack(fill="x", padx=10, pady=5)
+        self.constr_entry.bind("<FocusIn>", self._constr_focus_in)
+        self.constr_entry.bind("<FocusOut>", self._constr_focus_out)
 
         # Tipo de optimización
         opt_frame = ctk.CTkFrame(main_frame)
@@ -175,7 +195,7 @@ class MainApp(ctk.CTk):
         for cb in (self.use_uncon, self.use_gd):
             cb.select()
         for cb in (self.use_uncon, self.use_gd, self.use_lagrange, self.use_penalty):
-            cb.pack(side="left", padx=5)
+            cb.pack(side="left", padx=5, pady=5)
 
         # Punto inicial
         start_label = ctk.CTkLabel(main_frame, text="Punto inicial:", 
@@ -409,6 +429,30 @@ class MainApp(ctk.CTk):
         except Exception as e:
             self.output.insert("end", f"\n❌ Error al exportar: {e}\n")
 
+        # Set initial placeholder state
+        self._obj_focus_out(None)
+        self._constr_focus_out(None)
+
+    def _obj_focus_in(self, event):
+        if self.obj_entry.cget("text_color") == "gray":
+            self.obj_entry.delete("1.0", "end")
+            self.obj_entry.configure(text_color=self.text_color)
+
+    def _obj_focus_out(self, event):
+        if not self.obj_entry.get("1.0", "end-1c"):
+            self.obj_entry.insert("1.0", self.obj_placeholder)
+            self.obj_entry.configure(text_color="gray")
+
+    def _constr_focus_in(self, event):
+        if self.constr_entry.cget("text_color") == "gray":
+            self.constr_entry.delete("1.0", "end")
+            self.constr_entry.configure(text_color=self.text_color)
+
+    def _constr_focus_out(self, event):
+        if not self.constr_entry.get("1.0", "end-1c"):
+            self.constr_entry.insert("1.0", self.constr_placeholder)
+            self.constr_entry.configure(text_color="gray")
+
     def run_solvers(self) -> None:
         threading.Thread(target=self._run_solvers_impl, daemon=True).start()
 
@@ -458,6 +502,8 @@ class MainApp(ctk.CTk):
         try:
             vars_text = self.var_entry.get().strip()
             obj_text = self.obj_entry.get("1.0", "end").strip()
+            if self.obj_entry.cget("text_color") == "gray":
+                obj_text = ""
             constr_text = self.constr_entry.get("1.0", "end").strip()
             params_text = self.params_entry.get("1.0", "end").strip()
             
@@ -565,14 +611,12 @@ class MainApp(ctk.CTk):
             if ineq_status:
                 self.output.insert("end", "\n✅ Restricciones de desigualdad:\n" + "\n".join(ineq_status) + "\n")
 
-            # Trayectoria gradiente
             for r in results:
                 if r.method == 'GradientDescent' and 'history' in r.extra:
                     self.output.insert("end", "\n📈 Trayectoria del Gradiente (iteración, ||gradiente||, f(x)):\n")
                     for it, xvec, gnorm, obj_val in r.extra['history'][:30]:
                         self.output.insert("end", f"  {it:3d}: ||∇f||={gnorm:.3e}, f(x)={obj_val:.6f} → {xvec}\n")
 
-            # Plot si 2 variables
             if len(problem.variables) == 2 and results:
                 try:
                     from src.visualization.plots import surface_with_point, gradient_convergence_plot, cylinder_analysis_plot

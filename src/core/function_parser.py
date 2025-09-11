@@ -68,7 +68,7 @@ class FunctionParser:
                 left, right = line.split('>', 1)
                 ineqs.append(sp.Gt(sp.sympify(left, locals=local_dict), sp.sympify(right, locals=local_dict)))
             else:
-                raise ValueError(f"Cannot parse constraint line: {line}")
+                raise ValueError(f"La restricción '{line}' no es válida. Asegúrese de que es una ecuación o inecuación (ej: 'g(x)=0', 'h(x)<=0').")
         return eqs, ineqs
 
     @classmethod
